@@ -52,3 +52,20 @@ indexing_docs(files)
 
 query_input = input("Enter query : ")
 searcher(query_input)
+
+from whoosh.analysis import StandardAnalyzer, StopFilter, StemmingAnalyzer
+
+def preprocess_text(text):
+    # Define the analyzer for removing stop words and stemming
+    analyzer = StemmingAnalyzer() | StopFilter()
+
+    # Tokenize and analyze the text using the defined analyzer
+    tokens = [token.text for token in analyzer(text)]
+
+    # Join the tokens back together to form a preprocessed string
+    preprocessed_text = " ".join(tokens)
+
+    return preprocessed_text
+
+a = preprocess_text("HEllo eveRy one schools and very Good was were")
+prnt

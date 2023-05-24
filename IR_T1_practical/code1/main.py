@@ -13,6 +13,7 @@ def create_inverted_index(files):
                 inverted_index[word].append(i + 1)
     for word in inverted_index:
         inverted_index[word].sort()
+    print(inverted_index)
     return inverted_index
 
 
