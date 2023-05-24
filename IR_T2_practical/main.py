@@ -6,6 +6,7 @@ from whoosh.analysis import StandardAnalyzer, StopFilter, StemmingAnalyzer
 from whoosh.lang.porter import stem
 from whoosh.lang.stopwords import stoplists
 from collections import namedtuple
+import sys
     
 
 class CosineSimilarity:
@@ -72,13 +73,15 @@ class CosineSimilarity:
         # Removed stop words and finds the root of the rest
         tf: Dict[str, int] = Counter(query.split())
         q_vec:List[float] = [tf[w] * self.idf[w] if w in tf else 0 for w in self.doc_freqs.keys()]
-
         sims:List[Tuple[str, float]] = []
         for _, (title, d_vec) in self.doc_vectors.items():
             dot_product:float = sum([a*b for a,b in zip(d_vec, q_vec)])
             norm_d:float = math.sqrt(sum([a*a for a in d_vec]))
             norm_q:float = math.sqrt(sum([a*a for a in q_vec]))
-            sim:float = dot_product / (norm_d * norm_q)
+            try:
+                sim:float = dot_product / (norm_d * norm_q)
+            except ZeroDivisionError:
+                sim:float = dot_product / ((norm_d * norm_q)+0.0001)
             sims.append((title, sim))
 
         return sims
@@ -160,4 +163,4 @@ class Searcher:
 
 
 s = Searcher()
-print(s.search_query("fetal"))
+print(s.search_query("variation"))
