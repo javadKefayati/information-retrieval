@@ -2,11 +2,10 @@ import math
 from collections import Counter
 from typing import Dict , List , Any
 from typing import Tuple
-from whoosh.analysis import StandardAnalyzer, StopFilter, StemmingAnalyzer
+from whoosh.analysis import StopFilter, StemmingAnalyzer
 from whoosh.lang.porter import stem
 from whoosh.lang.stopwords import stoplists
-from collections import namedtuple
-import sys
+import heapq
     
 
 class CosineSimilarity:
@@ -93,6 +92,7 @@ class Searcher:
         self.read_content_from_docs()
         self.normalize_contents()
         self.cosineSimilarity = CosineSimilarity(self.information)
+        self.results: List[Tuple[str, int]] = []
         
     def preprocessed_text(self, text:str )-> str:
         """This function takes a Text and removes the stop words and finds the root of the rest
@@ -158,9 +158,29 @@ class Searcher:
             List[tuple[str,int]]: results of similar document
         """
         query = self.preprocessed_text(query)
-        results = self.cosineSimilarity.cosine_similarity(query)
-        return results
+        self.results = self.cosineSimilarity.cosine_similarity(query)
+
+    def get_nlargest_similarity_doc(self, n_first:int) ->List[Tuple[str,int]]:
+        return heapq.nlargest(n_first, self.results, key=lambda x: x[1])
+
+    def print_results(self, n_first = 10)-> None:
+        if self.results != None :
+            n_first_similarty_doc = self.get_nlargest_similarity_doc(n_first)
+            print('----------------- RESULTS ---------------------')
+            print("      SCORE         ***     DOCUMENT NUMBER")
+            print('-----------------------------------------------')
+
+            for index,result in enumerate(n_first_similarty_doc):
+                document_number = result[0]
+                score = index + 1
+                print(f"      {score}                     {document_number}")
+        else :
+            print("Please First call search query function")
 
 
 s = Searcher()
-print(s.search_query("variation"))
+query = input('Please enter your query: ')
+s.search_query(query)
+s.print_results(12)
+
+
