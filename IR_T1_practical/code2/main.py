@@ -68,4 +68,3 @@ def preprocess_text(text):
     return preprocessed_text
 
 a = preprocess_text("HEllo eveRy one schools and very Good was were")
-prnt
