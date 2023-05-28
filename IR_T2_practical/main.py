@@ -92,7 +92,7 @@ class Searcher:
         self.read_content_from_docs()
         self.normalize_contents()
         self.cosineSimilarity = CosineSimilarity(self.information)
-        self.results: List[Tuple[str, int]] = []
+        self.results: List[Tuple[str, float]] = []
         
     def preprocessed_text(self, text:str )-> str:
         """This function takes a Text and removes the stop words and finds the root of the rest
@@ -148,29 +148,41 @@ class Searcher:
             # Update content each info with remove stop words and ...
             self.information[index] = (document_number,self.preprocessed_text(content))
     
-    def search_query(self, query:str)-> List[Any]:
+    def search_query(self, query:str):
         """ This function is to get similar document to a document
 
         Args:
             query (str): A text to get similar document
 
-        Returns:
-            List[tuple[str,int]]: results of similar document
         """
         query = self.preprocessed_text(query)
         self.results = self.cosineSimilarity.cosine_similarity(query)
 
-    def get_nlargest_similarity_doc(self, n_first:int) ->List[Tuple[str,int]]:
+    def get_nlargest_similarity_doc(self, n_first:int) ->List[Tuple[str,float]]:
+        """ Return a list of nearly result for query and documents
+
+        Args:
+            n_first (int): Number of nearly results
+
+        Returns:
+            List[Tuple[str,float]]: A list contain score and document number
+        """
         return heapq.nlargest(n_first, self.results, key=lambda x: x[1])
 
-    def print_results(self, n_first = 10)-> None:
-        if self.results != None :
-            n_first_similarty_doc = self.get_nlargest_similarity_doc(n_first)
+    def print_results(self, n_first:int = 10)-> None:
+        """ Print all ranked score 
+
+        Args:
+            n_first (int, optional): Number of nearly results. Defaults to 10.
+        """
+        
+        if len(self.results) != 0  :
+            n_first_similarly_doc = self.get_nlargest_similarity_doc(n_first)
             print('----------------- RESULTS ---------------------')
             print("      SCORE         ***     DOCUMENT NUMBER")
             print('-----------------------------------------------')
 
-            for index,result in enumerate(n_first_similarty_doc):
+            for index,result in enumerate(n_first_similarly_doc):
                 document_number = result[0]
                 score = index + 1
                 print(f"      {score}                     {document_number}")
