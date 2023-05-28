@@ -159,9 +159,22 @@ class Searcher:
         self.results = self.cosineSimilarity.cosine_similarity(query)
 
     def get_nlargest_similarity_doc(self, n_first:int) ->List[Tuple[str,float]]:
+        """ Return a list of nearly result for query and documents
+
+        Args:
+            n_first (int): Number of nearly results
+
+        Returns:
+            List[Tuple[str,float]]: A list contain score and document number
+        """
         return heapq.nlargest(n_first, self.results, key=lambda x: x[1])
 
     def print_results(self, n_first:int = 10)-> None:
+        """ Print all ranked score 
+
+        Args:
+            n_first (int, optional): Number of nearly results. Defaults to 10.
+        """
         
         if len(self.results) != 0  :
             n_first_similarly_doc = self.get_nlargest_similarity_doc(n_first)
