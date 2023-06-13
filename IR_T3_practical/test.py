@@ -41,22 +41,4 @@ def search_html_files(query, directory="html_files"):
 
     return matching_files
 
-def main():
-    url = "https://stackoverflow.com/"  # Replace with the desired URL
-    html_files = crawl_url(url)
-    save_html_files(html_files)
 
-    scores = {}
-    for url, content in html_files:
-        file_name = urlparse(url).path.split("/")[-1] or "index.html"
-        scores[file_name] = bayes_scoring(content)
-
-    # Example query
-    query = "python"  # Replace with the desired query
-    matching_files = search_html_files(query)
-    for file_name, file_path in matching_files:
-        print(f"File: {file_name} (score: {scores[file_name]})\nPath: {file_path}")
-
-if __name__ == "__main__":
-    # main()
-    print(word_tokenize("hello guys and were none"))
