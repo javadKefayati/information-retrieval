@@ -49,6 +49,8 @@ def get_all_website_links(url):
         href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
         if 'team' in str(href):
             continue
+        if 'java' not in str(href):
+            continue
         if not is_valid(href):
             # not a valid URL
             continue
@@ -86,7 +88,7 @@ def get_all_website_text(url):
 
     global url_id
 
-    with open(f"docs/{url_id}.json", "w") as f:
+    with open(f"lang_docs/java/{url_id}.json", "w") as f:
         json.dump(result, f)
 
     url_id += 1
@@ -117,7 +119,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     url = args.url
-    max_urls = 10
+    max_urls = 5
     # domain name of the URL without the protocol
     domain_name = urlparse(url).netloc
     crawl(url, max_urls=max_urls)
