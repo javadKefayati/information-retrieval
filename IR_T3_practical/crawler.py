@@ -19,6 +19,7 @@ external_urls = set()
 main_data = set()
 
 total_urls_visited = 0
+url_id = 1
 
 
 def is_valid(url):
@@ -46,6 +47,8 @@ def get_all_website_links(url):
         parsed_href = urlparse(href)
         # remove URL GET parameters, URL fragments, etc.
         href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
+        if 'team' in str(href):
+            continue
         if not is_valid(href):
             # not a valid URL
             continue
@@ -60,7 +63,10 @@ def get_all_website_links(url):
             continue
         print(f"{GREEN}[*] Internal link: {href}{RESET}")
         urls.add(href)
-        get_all_website_text(href)
+        try:
+            get_all_website_text(href)
+        except:
+            pass
         internal_urls.add(href)
     return urls
 
@@ -78,11 +84,15 @@ def get_all_website_text(url):
             result[tag.name] = []
         result[tag.name].append(tag.string.strip())
 
-    with open(f"docs/{uuid.uuid4()}.json", "w") as f:
+    global url_id
+
+    with open(f"docs/{url_id}.json", "w") as f:
         json.dump(result, f)
 
+    url_id += 1
 
-def crawl(url, max_urls=30):
+
+def crawl(url, max_urls=5):
     """
     Crawls a web page and extracts all links.
     You'll find all links in `external_urls` and `internal_urls` global set variables.
@@ -107,7 +117,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     url = args.url
-    max_urls = 30
+    max_urls = 10
     # domain name of the URL without the protocol
     domain_name = urlparse(url).netloc
     crawl(url, max_urls=max_urls)
