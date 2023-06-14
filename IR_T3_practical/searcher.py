@@ -1,5 +1,8 @@
 from typing import Dict , List , Any
 from typing import Tuple
+from collections import Counter
+import math
+
 from whoosh.analysis import StopFilter, StemmingAnalyzer
 from whoosh.lang.porter import stem
 from whoosh.lang.stopwords import stoplists
@@ -154,6 +157,7 @@ class Searcher:
             List[Tuple[str,float]]: A list contain score and document number
         """
         return heapq.nlargest(n_first,self.scores_details, key=lambda x: x[1])
+    
     def query_with_bayes_algo(self, query:str= "query")->None:
         """calculating rank
 
@@ -177,7 +181,11 @@ class Searcher:
         self.scores_details = tuple(zip(self.files_name, scores[0]))
     
     def query_with_cos_algo(self,query=""):
-        self.cosineSimilarity = CosineSimilarity(self.information)
+        information = []
+        for i in range(len(self.content_each_file)):
+            information.append([self.files_name[i], self.content_each_file[i] ])
+            
+        self.cosineSimilarity = CosineSimilarity(information)
         query = self.preprocessed_text(query)
         self.scores_details = self.cosineSimilarity.cosine_similarity(query)
         
@@ -206,6 +214,9 @@ class Searcher:
 
 
 s = Searcher()
-s.query("chat")
+s.query_with_cos_algo("chat")
+s.print_results(n_first = 2)
+print("\n\n \n")
+s.query_with_bayes_algo("chat")
 s.print_results(n_first = 2)
 

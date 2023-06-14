@@ -132,6 +132,7 @@ class Searcher:
                             doc.split(".W")[1].replace("\n"," ")]
                             for doc in list_of_documents
                         ]
+
             
 
     def normalize_contents(self) :
