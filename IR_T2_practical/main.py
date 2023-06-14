@@ -185,7 +185,8 @@ class Searcher:
             for index,result in enumerate(n_first_similarly_doc):
                 document_number = result[0]
                 score = index + 1
-                print(f"      {score}                     {document_number}")
+                print(f"        {score:<20}{document_number}")
+
         else :
             print("Please First call search query function")
 

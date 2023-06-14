@@ -1,4 +1,6 @@
-import glob
+s = contents.split()
+            for word in set(words):
+                if word import glob
 
 
 def create_inverted_index(files):
@@ -6,9 +8,7 @@ def create_inverted_index(files):
     for i, file in enumerate(files):
         with open(file, 'r') as f:
             contents = f.read()
-            words = contents.split()
-            for word in set(words):
-                if word not in inverted_index:
+            wordnot in inverted_index:
                     inverted_index[word] = []
                 inverted_index[word].append(i + 1)
     for word in inverted_index:

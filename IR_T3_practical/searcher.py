@@ -1,16 +1,13 @@
-import math
-from collections import Counter
 from typing import Dict , List , Any
 from typing import Tuple
 from whoosh.analysis import StopFilter, StemmingAnalyzer
 from whoosh.lang.porter import stem
 from whoosh.lang.stopwords import stoplists
 import heapq
-import glob
 import os
-import sys
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from typing import Tuple,List
 import json
 class Searcher:
     header_tags = ["h1", "h2", "h3", "h4", "h5", "h6","title"]
@@ -66,29 +63,65 @@ class Searcher:
             total_content = self.preprocessed_text(simple_text) +self.preprocessed_text(headers_str) * self.header_weight
             
             self.content_each_file.append(total_content)
+            
+    # for this func please change result of func to number nearly score or prediction 
+    def get_nlargest_similarity_doc(self, n_first:int ) ->List[Tuple[str,float]]:
+        """ Return a list of nearly result for query and documents
 
-    def query(self, query=""):
-        # print((self.content_each_file))
-        # print(len(self.files_name))
+        Args:
+            n_first (int): Number of nearly results
+
+        Returns:
+            List[Tuple[str,float]]: A list contain score and document number
+        """
+        return heapq.nlargest(n_first,self.scores_details, key=lambda x: x[1])
+    def query(self, query:str= "query")->None:
+        """calculating rank
+
+        Args:
+            query (str, optional): a string that for search in json files. Defaults to "query".
+        """
+
         # Create a vectorizer to convert text into numerical features
         vectorizer = CountVectorizer()
-
+        
         # Vectorize the documents
         X = vectorizer.fit_transform(self.content_each_file)
-        print(X)
         
         # Train a Naive Bayes classifier on the vectorized documents
         clf = MultinomialNB()
+        
         clf.fit(X, self.files_name)
         new_vec = vectorizer.transform([query])
-        print(new_vec)
-        prediction = clf.predict(query)
-        return prediction
+        # print(new_vec)
+        scores = clf.predict_proba(new_vec)
+        self.scores_details = tuple(zip(self.files_name, scores[0]))
 
-    
+    def print_results(self, n_first:int = 10)-> None:
+        """ Print all ranked score 
+
+        Args:
+            n_first (int, optional): Number of nearly results. Defaults to 10.
+        """
+        
+        if len(self.scores_details) != 0  :
+            n_first_similarly_doc = self.get_nlargest_similarity_doc(n_first)
+            print('----------------- RESULTS ---------------------')
+            print("      SCORE         ***     DOCUMENT NAME")
+            print('-----------------------------------------------')
+
+            for index,result in enumerate(n_first_similarly_doc):
+                
+                document_number = result[0].split(".")[0]
+                score = index + 1
+                print(f"        {score:<20}{document_number}")
+
+        else :
+            print("Please First call search query function")
                 
 
 
 s = Searcher()
-print(s.query("access"))
+s.query("chat")
+s.print_results(n_first = 2)
 
